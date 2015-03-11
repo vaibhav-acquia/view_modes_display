@@ -1,3 +1,4 @@
 name = View Modes Display
 description = Preview view modes for every entity type
 core = 7.x
+dependencies[] = entity
