@@ -1,0 +1,9 @@
+view_modes_display.view_modes:
+  path: '/node/{node}/preview'
+  defaults:
+    _controller: '\Drupal\view_modes_display\Controller\DefaultController::preview'
+  requirements:
+    _permission: 'access content'
+    node: \d+
+  options:
+    _node_operation_route: TRUE
