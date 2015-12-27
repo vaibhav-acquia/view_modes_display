@@ -10,6 +10,7 @@ namespace Drupal\view_modes_display\Controller;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\node\NodeInterface;
+use Drupal\user\UserInterface;
 
 /**
  * Class DefaultController.
@@ -17,6 +18,22 @@ use Drupal\node\NodeInterface;
  * @package Drupal\view_modes_display\Controller
  */
 class DefaultController extends ControllerBase {
+
+  /**
+   * @param \Drupal\node\NodeInterface $node
+   * @return string
+   */
+  public function previewNode(NodeInterface $node) {
+    return $this->preview($node);
+  }
+
+  /**
+   * @param \Drupal\user\UserInterface $user
+   * @return string
+   */
+  public function previewUser(UserInterface $user) {
+    return $this->preview($user);
+  }
 
   /**
    * Preview entity view modes.

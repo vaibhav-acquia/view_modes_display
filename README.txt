@@ -22,7 +22,6 @@ At this moment, the following entity types are supported:
 
 - node
 - user
-- taxonomy
 
 Support for custom entities is planned, and patches are welcome!
 
