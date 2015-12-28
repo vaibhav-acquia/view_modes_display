@@ -3,7 +3,7 @@ view_modes_display.node:
   defaults:
     _controller: '\Drupal\view_modes_display\Controller\DefaultController::previewNode'
   requirements:
-    _permission: 'administer nodes'
+    _permission: 'administer node display'
     node: \d+
 view_modes_display.user:
   path: '/user/{user}/preview'
