@@ -5,6 +5,13 @@ view_modes_display.node:
   requirements:
     _permission: 'administer node display'
     node: \d+
+view_modes_display.block_content:
+  path: '/block/{block_content}/preview'
+  defaults:
+    _controller: '\Drupal\view_modes_display\Controller\DefaultController::previewBlockContent'
+  requirements:
+    _permission: 'administer blocks'
+    block_content: \d+
 view_modes_display.user:
   path: '/user/{user}/preview'
   defaults:
