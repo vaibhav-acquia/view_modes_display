@@ -12,7 +12,7 @@ function view_modes_display_menu() {
     'page callback' => 'view_modes_display_preview_entity',
     'page arguments' => array(1, 'node'),
     'file' => 'view_modes_display.pages.inc',
-    'access arguments' => array('administer content types'),
+    'access arguments' => array('preview view modes'),
     'type' => MENU_LOCAL_TASK,
   );
 
@@ -22,7 +22,7 @@ function view_modes_display_menu() {
     'page callback' => 'view_modes_display_preview_entity',
     'page arguments' => array(1, 'user'),
     'file' => 'view_modes_display.pages.inc',
-    'access arguments' => array('administer users'),
+    'access arguments' => array('preview view modes'),
     'type' => MENU_LOCAL_TASK,
   );
 
@@ -32,7 +32,7 @@ function view_modes_display_menu() {
       'description' => 'Preview display of this term.',
       'page callback' => 'view_modes_display_preview_entity',
       'page arguments' => array(2, 'taxonomy_term'),
-      'access arguments' => array('administer taxonomy'),
+      'access arguments' => array('preview view modes'),
       'file' => 'view_modes_display.pages.inc',
       'type' => MENU_LOCAL_TASK,
       'weight' => 12,
