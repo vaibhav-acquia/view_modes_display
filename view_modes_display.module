@@ -79,7 +79,7 @@ function view_modes_display_permission() {
  * Implements hook_contextual_links_view_alter().
  */
 function view_modes_display_contextual_links_view_alter(&$element, $items) {
-  if (!empty($element['#element']['#entity_type']) && !empty($element['#element']['#bundle']) && user_access('administer content types')) {
+  if (!empty($element['#element']['#entity_type']) && !empty($element['#element']['#bundle']) && !empty($element['#element']['#node']) && user_access('administer content types')) {
     $entity_type = $element['#element']['#entity_type'];
     $bundle = $element['#element']['#bundle'];
     $view_mode = isset($element['#element']['#view_mode']) ? $element['#element']['#view_mode'] : 'default';
