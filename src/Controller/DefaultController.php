@@ -21,7 +21,7 @@ class DefaultController extends ControllerBase {
    * @param \Drupal\node\NodeInterface $node
    *   The node.
    *
-   * @return string
+   * @return array
    *   Preview content of the node.
    */
   public function previewNode(NodeInterface $node) {
@@ -34,7 +34,7 @@ class DefaultController extends ControllerBase {
    * @param \Drupal\block_content\BlockContentInterface $block_content
    *   The block content.
    *
-   * @return string
+   * @return array
    *   Preview content of the block.
    */
   public function previewBlockContent(BlockContentInterface $block_content) {
@@ -47,7 +47,7 @@ class DefaultController extends ControllerBase {
    * @param \Drupal\user\UserInterface $user
    *   The user.
    *
-   * @return string
+   * @return array
    *   Preview user.
    */
   public function previewUser(UserInterface $user) {
@@ -57,61 +57,64 @@ class DefaultController extends ControllerBase {
   /**
    * Preview entity view modes.
    *
-   * @return string
+   * @param \Drupal\Core\ContentEntityInterface $entity
+   *   Content Entity Interface.
+   *
+   * @return array
    *   Preview content of entity view modes.
    */
   public function preview(ContentEntityInterface $entity) {
-    $entity_manager = $this->entityManager();
-    $entity_type = $entity->getEntityType()->get('id');
+    $entityTypeId = $entity->getEntityType()->get('id');
 
-    $view_modes_info = $entity_manager->getViewModes($entity_type);
+    $entityDisplayRepository = \Drupal::service('entity_display.repository');
+    $viewModes = $entityDisplayRepository->getViewModes($entityTypeId);
 
-    $config_prefix = 'core.entity_view_display';
-    $entity_type_id = $entity->getEntityType()->id();
+    $configPrefix = 'core.entity_view_display';
 
-    $ids = $this->configFactory()->listAll($config_prefix . '.' . $entity_type_id . '.' . $entity->bundle() . '.');
+    $configKeys = \Drupal::configFactory()
+      ->listAll($configPrefix . '.' . $entityTypeId . '.' . $entity->bundle() . '.');
 
-    $load_ids = [];
-    foreach ($ids as $id) {
-      $config_id = str_replace($config_prefix . '.', '', $id);
-      list(,, $display_mode) = explode('.', $config_id);
-      $load_ids[] = $config_id;
+    $displayKeys = [];
+    foreach ($configKeys as $configKey) {
+      $displayKeys[] = str_replace($configPrefix . '.', '', $configKey);
     }
 
-    $enabled_display_modes = [];
-    $displays = $entity_manager->getStorage('entity_view_display')->loadMultiple($load_ids);
+    $entityManager = \Drupal::entityTypeManager();
+    $displays = $entityManager->getStorage('entity_view_display')->loadMultiple($displayKeys);
+
+    $enabledDisplayModes = [];
     foreach ($displays as $display) {
       if ($display->status()) {
-        $enabled_display_modes[] = $display->get('mode');
+        $enabledDisplayModes[] = $display->get('mode');
       }
     }
 
-    if (!array_key_exists('full', $view_modes_info)) {
-      $view_modes_info['full'] = [
+    if (!array_key_exists('full', $viewModes)) {
+      $viewModes['full'] = [
         'label' => t('Default'),
       ];
     }
 
-    if (!array_key_exists('full', $enabled_display_modes)) {
-      $enabled_display_modes[] = 'full';
+    if (!array_key_exists('full', $enabledDisplayModes)) {
+      $enabledDisplayModes[] = 'full';
     }
 
     $view_builder = \Drupal::entityTypeManager()
       ->getViewBuilder($entity->getEntityTypeId());
 
     // Loop through the view modes and render in-place.
-    $build = [];
-    foreach ($view_modes_info as $view_mode_name => $view_mode_info) {
-      if (in_array($view_mode_name, $enabled_display_modes)) {
-        $build[] = [
-          '#prefix' => '<div class="view-mode-list-item view-mode-list-item-' . $view_mode_name . '"><h1>' . $view_mode_info['label'] . '</h1>',
-          '#markup' => render($view_builder->view($entity, $view_mode_name)),
+    $renderArray = [];
+    foreach ($viewModes as $viewMode => $viewModeData) {
+      if (in_array($viewMode, $enabledDisplayModes)) {
+        $renderArray[] = [
+          '#prefix' => '<div class="view-mode-list-item view-mode-list-item-' . $viewMode . '"><h1>' . $viewModeData['label'] . '</h1>',
+          '#markup' => render($view_builder->view($entity, $viewMode)),
           '#suffix' => '</div>',
         ];
       }
     }
 
-    return $build;
+    return $renderArray;
   }
 
 }
