@@ -102,7 +102,6 @@ class DefaultController extends ControllerBase {
     $view_builder = \Drupal::entityTypeManager()
       ->getViewBuilder($entity->getEntityTypeId());
 
-    // Loop through the view modes and render in-place.
     $renderArray = [];
     foreach ($viewModes as $viewMode => $viewModeData) {
       if (in_array($viewMode, $enabledDisplayModes)) {
