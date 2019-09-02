@@ -99,7 +99,7 @@ class DefaultController extends ControllerBase {
       $enabledDisplayModes[] = 'full';
     }
 
-    $view_builder = \Drupal::entityTypeManager()
+    $viewBuilder = \Drupal::entityTypeManager()
       ->getViewBuilder($entity->getEntityTypeId());
 
     $renderArray = [];
@@ -107,7 +107,7 @@ class DefaultController extends ControllerBase {
       if (in_array($viewMode, $enabledDisplayModes)) {
         $renderArray[] = [
           '#prefix' => '<div class="view-mode-list-item view-mode-list-item-' . $viewMode . '"><h1>' . $viewModeData['label'] . '</h1>',
-          '#markup' => render($view_builder->view($entity, $viewMode)),
+          '#markup' => render($viewBuilder->view($entity, $viewMode)),
           '#suffix' => '</div>',
         ];
       }
