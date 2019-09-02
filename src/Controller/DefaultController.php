@@ -86,14 +86,26 @@ class DefaultController extends ControllerBase {
       }
     }
 
+    if (!array_key_exists('full', $view_modes_info)) {
+      $view_modes_info['full'] = [
+        'label' => t('Default'),
+      ];
+    }
+
+    if (!array_key_exists('full', $enabled_display_modes)) {
+      $enabled_display_modes[] = 'full';
+    }
+
+    $view_builder = \Drupal::entityTypeManager()
+      ->getViewBuilder($entity->getEntityTypeId());
+
     // Loop through the view modes and render in-place.
     $build = [];
     foreach ($view_modes_info as $view_mode_name => $view_mode_info) {
       if (in_array($view_mode_name, $enabled_display_modes)) {
-        $markup = entity_view($entity, $view_mode_name);
         $build[] = [
           '#prefix' => '<div class="view-mode-list-item view-mode-list-item-' . $view_mode_name . '"><h1>' . $view_mode_info['label'] . '</h1>',
-          '#markup' => render($markup),
+          '#markup' => render($view_builder->view($entity, $view_mode_name)),
           '#suffix' => '</div>',
         ];
       }
