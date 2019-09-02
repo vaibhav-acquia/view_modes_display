@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\view_modes_display\Controller\DefaultController.
- */
-
 namespace Drupal\view_modes_display\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
@@ -21,24 +16,39 @@ use Drupal\user\UserInterface;
 class DefaultController extends ControllerBase {
 
   /**
+   * Returns content of the node.
+   *
    * @param \Drupal\node\NodeInterface $node
+   *   The node.
+   *
    * @return string
+   *   Preview content of the node.
    */
   public function previewNode(NodeInterface $node) {
     return $this->preview($node);
   }
 
   /**
-   * @param \Drupal\block_content\BlockContentInterface $block
+   * Returns content of the block.
+   *
+   * @param \Drupal\block_content\BlockContentInterface $block_content
+   *   The block content.
+   *
    * @return string
+   *   Preview content of the block.
    */
   public function previewBlockContent(BlockContentInterface $block_content) {
     return $this->preview($block_content);
   }
 
   /**
+   * Returns user.
+   *
    * @param \Drupal\user\UserInterface $user
+   *   The user.
+   *
    * @return string
+   *   Preview user.
    */
   public function previewUser(UserInterface $user) {
     return $this->preview($user);
@@ -48,9 +58,10 @@ class DefaultController extends ControllerBase {
    * Preview entity view modes.
    *
    * @return string
+   *   Preview content of entity view modes.
    */
   public function preview(ContentEntityInterface $entity) {
-    $entity_manager = \Drupal::entityManager();
+    $entity_manager = $this->entityManager();
     $entity_type = $entity->getEntityType()->get('id');
 
     $view_modes_info = $entity_manager->getViewModes($entity_type);
@@ -58,16 +69,16 @@ class DefaultController extends ControllerBase {
     $config_prefix = 'core.entity_view_display';
     $entity_type_id = $entity->getEntityType()->id();
 
-    $ids = \Drupal::configFactory()->listAll($config_prefix . '.' . $entity_type_id . '.' . $entity->bundle() . '.');
+    $ids = $this->configFactory()->listAll($config_prefix . '.' . $entity_type_id . '.' . $entity->bundle() . '.');
 
-    $load_ids = array();
+    $load_ids = [];
     foreach ($ids as $id) {
       $config_id = str_replace($config_prefix . '.', '', $id);
       list(,, $display_mode) = explode('.', $config_id);
       $load_ids[] = $config_id;
     }
 
-    $enabled_display_modes = array();
+    $enabled_display_modes = [];
     $displays = $entity_manager->getStorage('entity_view_display')->loadMultiple($load_ids);
     foreach ($displays as $display) {
       if ($display->status()) {
@@ -75,8 +86,8 @@ class DefaultController extends ControllerBase {
       }
     }
 
-    // Loop through the view modes and render in-place
-    $build = array();
+    // Loop through the view modes and render in-place.
+    $build = [];
     foreach ($view_modes_info as $view_mode_name => $view_mode_info) {
       if (in_array($view_mode_name, $enabled_display_modes)) {
         $markup = entity_view($entity, $view_mode_name);
