@@ -19,3 +19,10 @@ view_modes_display.user:
   requirements:
     _permission: 'preview view modes'
     user: \d+
+view_modes_display.media:
+  path: '/media/{media}/preview'
+  defaults:
+    _controller: '\Drupal\view_modes_display\Controller\DefaultController::previewMedia'
+  requirements:
+    _permission: 'preview view modes'
+    media: \d+

@@ -13,3 +13,8 @@ view_modes_display.user:
   route_name: view_modes_display.user
   base_route: entity.user.canonical
   weight: 21
+view_modes_display.media:
+  title: 'Preview'
+  route_name: view_modes_display.media
+  base_route: entity.media.canonical
+  weight: 21

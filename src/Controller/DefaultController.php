@@ -3,6 +3,7 @@
 namespace Drupal\view_modes_display\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\media\MediaInterface;
 use Drupal\node\NodeInterface;
 use Drupal\block_content\BlockContentInterface;
 use Drupal\user\UserInterface;
@@ -87,6 +88,19 @@ class DefaultController extends ControllerBase {
    */
   public function previewUser(UserInterface $user) {
     return $this->previewFactory->preview($user);
+  }
+
+  /**
+   * Returns media entity.
+   *
+   * @param \Drupal\media\MediaInterface $media
+   *   Media.
+   *
+   * @return array
+   *   Preview media entity.
+   */
+  public function previewMedia(MediaInterface $media) {
+    return $this->previewFactory->preview($media);
   }
 
 }
