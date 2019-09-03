@@ -1,0 +1,4 @@
+services:
+  view_modes_display.preview_factory:
+    class: Drupal\view_modes_display\Service\PreviewFactory
+    arguments: ['@config.factory', '@entity_type.manager', '@entity_display.repository']
