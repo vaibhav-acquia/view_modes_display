@@ -2,11 +2,15 @@
 
 namespace Drupal\view_modes_display\Controller;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\node\NodeInterface;
 use Drupal\block_content\BlockContentInterface;
 use Drupal\user\UserInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class DefaultController.
@@ -14,6 +18,64 @@ use Drupal\user\UserInterface;
  * @package Drupal\view_modes_display\Controller
  */
 class DefaultController extends ControllerBase {
+
+  /**
+   * ConfigFactory.
+   *
+   * @var Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $configFactory;
+
+  /**
+   * EntityTypeManager.
+   *
+   * @var Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
+   * EntityDisplayRepository.
+   *
+   * @var Drupal\Core\Entity\EntityDisplayRepositoryInterface
+   */
+  protected $entityDisplayRepository;
+
+  /**
+   * DefaultController constructor.
+   *
+   * @param Drupal\Core\Config\ConfigFactoryInterface $configFactory
+   *   Config Factory.
+   * @param Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   Entity Type Manager.
+   * @param Drupal\Core\Entity\EntityDisplayRepositoryInterface $entityDisplayRepository
+   *   Entity Display Repository.
+   */
+  public function __construct(
+    ConfigFactoryInterface $configFactory,
+    EntityTypeManagerInterface $entityTypeManager,
+    EntityDisplayRepositoryInterface $entityDisplayRepository
+  ) {
+    $this->configFactory = $configFactory;
+    $this->entityTypeManager = $entityTypeManager;
+    $this->entityDisplayRepository = $entityDisplayRepository;
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * @param Symfony\Component\DependencyInjection\ContainerInterface $container
+   *   Container.
+   *
+   * @return Drupal\Core\Controller\ControllerBase
+   *   ControllerBase with injected services.
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('config.factory'),
+      $container->get('entity_type.manager'),
+      $container->get('entity_display.repository')
+    );
+  }
 
   /**
    * Returns content of the node.
@@ -66,21 +128,18 @@ class DefaultController extends ControllerBase {
   public function preview(ContentEntityInterface $entity) {
     $entityTypeId = $entity->getEntityType()->get('id');
 
-    $entityDisplayRepository = \Drupal::service('entity_display.repository');
-    $viewModes = $entityDisplayRepository->getViewModes($entityTypeId);
+    $viewModes = $this->entityDisplayRepository->getViewModes($entityTypeId);
 
     $configPrefix = 'core.entity_view_display';
 
-    $configKeys = \Drupal::configFactory()
-      ->listAll($configPrefix . '.' . $entityTypeId . '.' . $entity->bundle() . '.');
+    $configKeys = $this->configFactory->listAll($configPrefix . '.' . $entityTypeId . '.' . $entity->bundle() . '.');
 
     $displayKeys = [];
     foreach ($configKeys as $configKey) {
       $displayKeys[] = str_replace($configPrefix . '.', '', $configKey);
     }
 
-    $entityManager = \Drupal::entityTypeManager();
-    $displays = $entityManager->getStorage('entity_view_display')->loadMultiple($displayKeys);
+    $displays = $this->entityTypeManager->getStorage('entity_view_display')->loadMultiple($displayKeys);
 
     $enabledDisplayModes = [];
     foreach ($displays as $display) {
@@ -99,8 +158,7 @@ class DefaultController extends ControllerBase {
       $enabledDisplayModes[] = 'full';
     }
 
-    $viewBuilder = \Drupal::entityTypeManager()
-      ->getViewBuilder($entity->getEntityTypeId());
+    $viewBuilder = $this->entityTypeManager->getViewBuilder($entity->getEntityTypeId());
 
     $renderArray = [];
     foreach ($viewModes as $viewMode => $viewModeData) {
