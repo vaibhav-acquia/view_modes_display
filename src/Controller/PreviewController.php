@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @package Drupal\view_modes_display\Controller
  */
-class DefaultController extends ControllerBase {
+class PreviewController extends ControllerBase {
 
   /**
    * ConfigFactory.

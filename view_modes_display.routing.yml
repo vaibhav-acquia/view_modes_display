@@ -1,28 +1,28 @@
 view_modes_display.node:
   path: '/node/{node}/preview'
   defaults:
-    _controller: '\Drupal\view_modes_display\Controller\DefaultController::previewNode'
+    _controller: '\Drupal\view_modes_display\Controller\PreviewController::previewNode'
   requirements:
     _permission: 'preview view modes'
     node: \d+
 view_modes_display.block_content:
   path: '/block/{block_content}/preview'
   defaults:
-    _controller: '\Drupal\view_modes_display\Controller\DefaultController::previewBlockContent'
+    _controller: '\Drupal\view_modes_display\Controller\PreviewController::previewBlockContent'
   requirements:
     _permission: 'preview view modes'
     block_content: \d+
 view_modes_display.user:
   path: '/user/{user}/preview'
   defaults:
-    _controller: '\Drupal\view_modes_display\Controller\DefaultController::previewUser'
+    _controller: '\Drupal\view_modes_display\Controller\PreviewController::previewUser'
   requirements:
     _permission: 'preview view modes'
     user: \d+
 view_modes_display.media:
   path: '/media/{media}/preview'
   defaults:
-    _controller: '\Drupal\view_modes_display\Controller\DefaultController::previewMedia'
+    _controller: '\Drupal\view_modes_display\Controller\PreviewController::previewMedia'
   requirements:
     _permission: 'preview view modes'
     media: \d+

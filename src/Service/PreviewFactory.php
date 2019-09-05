@@ -67,19 +67,37 @@ class PreviewFactory {
   public function preview(ContentEntityInterface $entity) {
     $entityTypeId = $entity->getEntityType()->get('id');
 
+    $entityDisplays = $this->getEntityDisplays($entityTypeId, $entity->bundle());
+    $enabledDisplayModes = $this->getEnabledDisplayModes($entityDisplays);
+
     $viewModes = $this->entityDisplayRepository->getViewModes($entityTypeId);
 
-    $configPrefix = 'core.entity_view_display';
+    $renderArray = [];
+    foreach ($viewModes as $viewMode => $viewModeData) {
+      if (FALSE == in_array($viewMode, $enabledDisplayModes)) {
+        continue;
+      }
 
-    $configKeys = $this->configFactory->listAll($configPrefix . '.' . $entityTypeId . '.' . $entity->bundle() . '.');
-
-    $displayKeys = [];
-    foreach ($configKeys as $configKey) {
-      $displayKeys[] = str_replace($configPrefix . '.', '', $configKey);
+      $renderArray[] = [
+        '#prefix' => '<div class="view-mode-list-item view-mode-list-item-' . $viewMode . '"><h1>' . $viewModeData['label'] . '</h1>',
+        '#markup' => render($this->buildMarkup($entity, $viewMode)),
+        '#suffix' => '</div>',
+      ];
     }
 
-    $displays = $this->entityTypeManager->getStorage('entity_view_display')->loadMultiple($displayKeys);
+    return $renderArray;
+  }
 
+  /**
+   * Returns array of enabled displays.
+   *
+   * @param array $displays
+   *   Entity displays.
+   *
+   * @return array
+   *   Array of enabled display modes.
+   */
+  protected function getEnabledDisplayModes(array $displays) {
     $enabledDisplayModes = [];
     foreach ($displays as $display) {
       if ($display->status()) {
@@ -87,30 +105,79 @@ class PreviewFactory {
       }
     }
 
-    if (!array_key_exists('full', $viewModes)) {
-      $viewModes['full'] = [
-        'label' => t('Default'),
-      ];
-    }
-
-    if (!array_key_exists('full', $enabledDisplayModes)) {
+    if (FALSE == array_key_exists('full', $enabledDisplayModes)) {
       $enabledDisplayModes[] = 'full';
     }
 
-    $viewBuilder = $this->entityTypeManager->getViewBuilder($entity->getEntityTypeId());
+    return $enabledDisplayModes;
+  }
 
-    $renderArray = [];
-    foreach ($viewModes as $viewMode => $viewModeData) {
-      if (in_array($viewMode, $enabledDisplayModes)) {
-        $renderArray[] = [
-          '#prefix' => '<div class="view-mode-list-item view-mode-list-item-' . $viewMode . '"><h1>' . $viewModeData['label'] . '</h1>',
-          '#markup' => render($viewBuilder->view($entity, $viewMode)),
-          '#suffix' => '</div>',
-        ];
-      }
+  /**
+   * Returns all display for an entity.
+   *
+   * @param string $entityTypeId
+   *   Entity id.
+   * @param string $entityBundle
+   *   Entity bundle.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface[]
+   *   Array of entity displays.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   */
+  private function getEntityDisplays($entityTypeId, $entityBundle) {
+    $configPrefix = 'core.entity_view_display';
+    $prefix = $configPrefix . '.' . $entityTypeId . '.' . $entityBundle . '.';
+
+    $configKeys = $this->configFactory->listAll($prefix);
+
+    $displayKeys = [];
+    foreach ($configKeys as $configKey) {
+      $displayKeys[] = str_replace($configPrefix . '.', '', $configKey);
     }
 
-    return $renderArray;
+    return $this->entityTypeManager->getStorage('entity_view_display')->loadMultiple($displayKeys);
+  }
+
+  /**
+   * Build markup required to render the entity in the desired view mode.
+   *
+   * @param Drupal\Core\Entity\ContentEntityInterface $entity
+   *   Entity class.
+   * @param string $viewMode
+   *   Entity view mode.
+   *
+   * @return array
+   *   Render array for the given entity.
+   *
+   * @todo Handle block requirements better.
+   */
+  protected function buildMarkup(ContentEntityInterface $entity, $viewMode) {
+    $entityTypeId = $entity->getEntityType()->get('id');
+    $viewBuilder = $this->entityTypeManager->getViewBuilder($entityTypeId);
+
+    if ('block_content' == $entityTypeId) {
+      $blockManager = \Drupal::service('plugin.manager.block');
+      $blockInstance = $blockManager->createInstance(
+        'block_content:' . $entity->uuid(),
+        [
+          'view_mode' => $viewMode,
+        ]
+      );
+
+      return [
+        // @todo Should be in BlockBase, wait https://www.drupal.org/node/2931040.
+        '#theme' => 'block',
+        '#configuration' => $blockInstance->getConfiguration(),
+        '#plugin_id' => $blockInstance->getPluginId(),
+        '#base_plugin_id' => $blockInstance->getBaseId(),
+        '#derivative_plugin_id' => $blockInstance->getDerivativeId(),
+        'content' => $blockInstance->build(),
+      ];
+    }
+
+    return $viewBuilder->view($entity, $viewMode);
   }
 
 }
