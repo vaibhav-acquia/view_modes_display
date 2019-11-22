@@ -80,9 +80,9 @@ class PreviewFactory {
 
       $markup = $this->buildMarkup($entity, $viewMode);
       $renderArray[] = [
-        '#prefix' => '<div class="view-mode-list-item view-mode-list-item-' . $viewMode . '"><h1>' . $viewModeData['label'] . '</h1>',
+        '#prefix' => '<div class="view-mode-list-item view-mode-list-item-' . $viewMode . '"><div class="view-mode-list-item-label">' . $viewModeData['label'] . '</div><div class="view-mode-list-item-content">',
         '#markup' => render($markup),
-        '#suffix' => '</div>',
+        '#suffix' => '</div></div>',
       ];
     }
 
