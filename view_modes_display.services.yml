@@ -2,3 +2,8 @@ services:
   view_modes_display.preview_factory:
     class: Drupal\view_modes_display\Service\PreviewFactory
     arguments: ['@config.factory', '@entity_type.manager', '@entity_display.repository']
+  view_modes_display.subscriber:
+    class: Drupal\view_modes_display\Routing\RouteSubscriber
+    arguments: ['@entity_type.manager', '@entity_display.repository']
+    tags:
+      - { name: event_subscriber }

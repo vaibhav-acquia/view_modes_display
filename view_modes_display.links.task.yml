@@ -18,3 +18,6 @@ view_modes_display.media:
   route_name: view_modes_display.media
   base_route: entity.media.canonical
   weight: 21
+view_modes_display.entities:
+  class: \Drupal\Core\Menu\LocalTaskDefault
+  deriver: \Drupal\view_modes_display\Plugin\Derivative\ViewModeDisplayLocalTask

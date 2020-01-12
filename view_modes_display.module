@@ -6,6 +6,7 @@
  */
 
 use Drupal\Core\Routing\RouteMatchInterface;
+use \Drupal\view_modes_display\EntityTypeInfo;
 
 /**
  * Implements hook_help().
@@ -30,4 +31,22 @@ function view_modes_display_theme() {
   $theme = [];
 
   return $theme;
+}
+
+/**
+ * Implements hook_entity_type_alter().
+ */
+function view_modes_display_entity_type_alter(array &$entity_types) {
+  return \Drupal::service('class_resolver')
+    ->getInstanceFromDefinition(EntityTypeInfo::class)
+    ->entityTypeAlter($entity_types);
+}
+
+/**
+ * Implements hook_entity_operation().
+ */
+function view_modes_display_entity_operation(\Drupal\Core\Entity\EntityInterface $entity) {
+  return \Drupal::service('class_resolver')
+    ->getInstanceFromDefinition(EntityTypeInfo::class)
+    ->entityOperation($entity);
 }

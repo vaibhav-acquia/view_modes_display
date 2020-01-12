@@ -98,7 +98,7 @@ class PreviewFactory {
    * @return array
    *   Array of enabled display modes.
    */
-  protected function getEnabledDisplayModes(array $displays) {
+  public function getEnabledDisplayModes(array $displays) {
     $enabledDisplayModes = [];
     foreach ($displays as $display) {
       if ($display->status()) {
@@ -127,7 +127,7 @@ class PreviewFactory {
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  private function getEntityDisplays($entityTypeId, $entityBundle) {
+  public function getEntityDisplays($entityTypeId, $entityBundle) {
     $configPrefix = 'core.entity_view_display';
     $prefix = $configPrefix . '.' . $entityTypeId . '.' . $entityBundle . '.';
 
@@ -154,7 +154,7 @@ class PreviewFactory {
    *
    * @todo Handle block requirements better.
    */
-  protected function buildMarkup(ContentEntityInterface $entity, $viewMode) {
+  public function buildMarkup(ContentEntityInterface $entity, $viewMode) {
     $entityTypeId = $entity->getEntityType()->get('id');
     $viewBuilder = $this->entityTypeManager->getViewBuilder($entityTypeId);
 
