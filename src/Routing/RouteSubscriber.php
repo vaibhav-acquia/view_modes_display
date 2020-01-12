@@ -48,10 +48,10 @@ class RouteSubscriber extends RouteSubscriberBase {
     foreach ($this->entityTypeManager->getDefinitions() as $entity_type_id => $entity_type) {
       if ($viewModes = $this->entityDisplayRepository->getViewModes($entity_type_id)) {
         if ($route = $this->getPreviewList($entity_type)) {
-          $collection->add("entity.$entity_type_id.wmd_preview_list", $route);
+          $collection->add("entity.$entity_type_id.vmd_preview_list", $route);
         }
         if ($route = $this->getPreviewRenderRoute($entity_type)) {
-          $collection->add("entity.$entity_type_id.wmd_preview_render" , $route);
+          $collection->add("entity.$entity_type_id.vmd_preview_render" , $route);
         }
       }
     }
@@ -67,7 +67,7 @@ class RouteSubscriber extends RouteSubscriberBase {
    *   The generated route, if available.
    */
   protected function getPreviewList(EntityTypeInterface $entity_type) {
-    if ($link_template = $entity_type->getLinkTemplate('wmd-preview-list')) {
+    if ($link_template = $entity_type->getLinkTemplate('vmd-preview-list')) {
       $entity_type_id = $entity_type->id();
       $route = new Route($link_template);
       $route
@@ -75,7 +75,7 @@ class RouteSubscriber extends RouteSubscriberBase {
           '_controller' => '\Drupal\view_modes_display\Controller\PreviewController::previewList',
           '_title' => 'Available View Mode Previews',
           'entity_type' => $entity_type_id,
-          'view_mode' => 'wmd-all',
+          'view_mode' => 'all',
         ])
         ->addRequirements([
           '_permission' => 'preview view modes',
@@ -99,7 +99,7 @@ class RouteSubscriber extends RouteSubscriberBase {
    *   The generated route, if available.
    */
   protected function getPreviewRenderRoute(EntityTypeInterface $entity_type) {
-    if ($link_template = $entity_type->getLinkTemplate('wmd-preview-render')) {
+    if ($link_template = $entity_type->getLinkTemplate('vmd-preview-list')) {
       $entity_type_id = $entity_type->id();
       $route = new Route($link_template);
       $route

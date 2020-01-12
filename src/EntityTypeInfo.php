@@ -67,8 +67,8 @@ class EntityTypeInfo implements ContainerInjectionInterface {
   public function entityTypeAlter(array &$entity_types) {
     foreach ($entity_types as $entity_type_id => $entity_type) {
       if ($viewModes = $this->entityDisplayRepository->getViewModes($entity_type_id)) {
-        $entity_type->setLinkTemplate('wmd-preview-list', "/view-mode-display/$entity_type_id/{{$entity_type_id}}/list");
-        $entity_type->setLinkTemplate('wmd-preview-render', "/view-mode-display/$entity_type_id/{{$entity_type_id}}/preview/{view_mode}");
+        $entity_type->setLinkTemplate('vmd-preview-list', "/$entity_type_id/{{$entity_type_id}}/preview/list");
+        $entity_type->setLinkTemplate('vmd-preview-list', "/$entity_type_id/{{$entity_type_id}}/preview/{view_mode}");
       }
     }
   }
@@ -87,11 +87,11 @@ class EntityTypeInfo implements ContainerInjectionInterface {
   public function entityOperation(EntityInterface $entity) {
     $operations = [];
     if ($this->currentUser->hasPermission('preview view modes')) {
-      if ($entity->hasLinkTemplate('wmd-preview-list')) {
+      if ($entity->hasLinkTemplate('vmd-preview-list')) {
         $operations['view-mode-display'] = [
           'title' => $this->t('Preview'),
           'weight' => 100,
-          'url' => $entity->toUrl('wmd-preview-list'),
+          'url' => $entity->toUrl('vmd-preview-list'),
         ];
       }
     }

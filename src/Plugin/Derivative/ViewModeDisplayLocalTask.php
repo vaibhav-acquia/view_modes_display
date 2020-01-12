@@ -57,10 +57,10 @@ class ViewModeDisplayLocalTask extends DeriverBase implements ContainerDeriverIn
 
     foreach ($this->entityTypeManager->getDefinitions() as $entity_type_id => $entity_type) {
 
-      if ($entity_type->hasLinkTemplate('wmd-preview-list')) {
+      if ($entity_type->hasLinkTemplate('vmd-preview-list')) {
 
         $this->derivatives["$entity_type_id.view_mode_display_tab"] = [
-          'route_name' => "entity.$entity_type_id.wmd_preview_list",
+          'route_name' => "entity.$entity_type_id.vmd_preview_list",
           'title' => $this->t('View Mode Preview'),
           'base_route' => "entity.$entity_type_id.canonical",
           'weight' => 150,

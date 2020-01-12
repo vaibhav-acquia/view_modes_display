@@ -40,6 +40,8 @@ class PreviewController extends ControllerBase {
    *
    * @param \Drupal\view_modes_display\Service\PreviewFactory $previewFactory
    *   Preview Factory.
+   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entityDisplayRepository
+   *   Entity Display Repository.
    */
   public function __construct(
     PreviewFactory $previewFactory,
@@ -66,62 +68,12 @@ class PreviewController extends ControllerBase {
   }
 
   /**
-   * Returns content of the node.
-   *
-   * @param \Drupal\node\NodeInterface $node
-   *   The node.
-   *
-   * @return array
-   *   Preview content of the node.
-   */
-  public function previewNode(NodeInterface $node) {
-    return $this->previewFactory->preview($node);
-  }
-
-  /**
-   * Returns content of the block.
-   *
-   * @param \Drupal\block_content\BlockContentInterface $block_content
-   *   The block content.
-   *
-   * @return array
-   *   Preview content of the block.
-   */
-  public function previewBlockContent(BlockContentInterface $block_content) {
-    return $this->previewFactory->preview($block_content);
-  }
-
-  /**
-   * Returns user.
-   *
-   * @param \Drupal\user\UserInterface $user
-   *   The user.
-   *
-   * @return array
-   *   Preview user.
-   */
-  public function previewUser(UserInterface $user) {
-    return $this->previewFactory->preview($user);
-  }
-
-  /**
-   * Returns media entity.
-   *
-   * @param \Drupal\media\MediaInterface $media
-   *   Media.
-   *
-   * @return array
-   *   Preview media entity.
-   */
-  public function previewMedia(MediaInterface $media) {
-    return $this->previewFactory->preview($media);
-  }
-
-  /**
    * Returns preview for entity - dedicated view mode or all of them.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   *   Entity.
+   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   *   Route match.
+   *
+   * @param string $entity_type
    *
    * @return array
    *   Preview render array.
@@ -134,7 +86,7 @@ class PreviewController extends ControllerBase {
     $renderArray = [];
     // Special view mode placeholder to fetch all. Default in the route
     // definition.
-    if ($view_mode == 'wmd-all') {
+    if ($view_mode == 'all') {
       $renderArray = $this->previewFactory->preview($entity);
     }
     else {
@@ -171,7 +123,7 @@ class PreviewController extends ControllerBase {
       if ((isset($view_modes[$display]['label']))) {
         $label = $view_modes[$display]['label'];
       }
-      $url = $entity->toUrl('wmd-preview-render');
+      $url = $entity->toUrl('vmd-preview-list');
       $url = $url->setRouteParameter('view_mode', $display);
       $links[] = [
         '#type' => 'link',
