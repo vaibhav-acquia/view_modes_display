@@ -67,8 +67,8 @@ class EntityTypeInfo implements ContainerInjectionInterface {
   public function entityTypeAlter(array &$entity_types) {
     foreach ($entity_types as $entity_type_id => $entity_type) {
       if ($viewModes = $this->entityDisplayRepository->getViewModes($entity_type_id)) {
-        $entity_type->setLinkTemplate('vmd-preview-list', "/$entity_type_id/{{$entity_type_id}}/preview/list");
-        $entity_type->setLinkTemplate('vmd-preview-list', "/$entity_type_id/{{$entity_type_id}}/preview/{view_mode}");
+        $entity_type->setLinkTemplate('vmd-preview-list', "/$entity_type_id/{{$entity_type_id}}/view-mode/preview/list");
+        $entity_type->setLinkTemplate('vmd-preview-list', "/$entity_type_id/{{$entity_type_id}}/view-mode/preview/{view_mode}");
       }
     }
   }
