@@ -1,0 +1,6 @@
+view_modes_display.vmd_settings_form:
+  title: 'View Modes Display Settings'
+  route_name: view_modes_display.vmd_settings_form
+  description: 'Configure which view modes are shown as a preview for selected users.'
+  parent: system.admin_config_content
+  weight: 99

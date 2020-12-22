@@ -22,6 +22,11 @@ No configuration is needed,
 enable the module and check for the "View Mode Preview" tab
 on any entity.
 
+However, if you want to preview all the view modes directly instead of listing what
+can be previewed and the clicking them one by one, you can change the functionality from
+the settings: `/admin/config/view_modes_display`. Also, you can disable certain modes
+there if you don't want them to be previewed at all.
+
 ### Supported Entities
 
 All current core entities as of 8.6.x are supported, 

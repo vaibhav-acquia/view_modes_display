@@ -2,6 +2,7 @@
 
 namespace Drupal\view_modes_display\Routing;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -29,16 +30,27 @@ class RouteSubscriber extends RouteSubscriberBase {
    */
   protected $entityDisplayRepository;
 
+  /**
+   * Drupal\Core\Config\ConfigFactoryInterface definition.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $configFactory;
 
   /**
    * Constructs a RouteSubscriber object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
+   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entityDisplayRepository
+   *   The entity display repository.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
+   *   The config factory.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityDisplayRepositoryInterface $entityDisplayRepository) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityDisplayRepositoryInterface $entityDisplayRepository, ConfigFactoryInterface $configFactory) {
     $this->entityTypeManager = $entity_type_manager;
     $this->entityDisplayRepository = $entityDisplayRepository;
+    $this->configFactory = $configFactory;
   }
 
   /**
@@ -51,7 +63,7 @@ class RouteSubscriber extends RouteSubscriberBase {
           $collection->add("entity.$entity_type_id.vmd_preview_list", $route);
         }
         if ($route = $this->getPreviewRenderRoute($entity_type)) {
-          $collection->add("entity.$entity_type_id.vmd_preview_render" , $route);
+          $collection->add("entity.$entity_type_id.vmd_preview_render", $route);
         }
       }
     }
@@ -80,10 +92,13 @@ class RouteSubscriber extends RouteSubscriberBase {
         ->addRequirements([
           '_permission' => 'preview view modes',
         ])
-        ->setOption('_admin_route', TRUE)
         ->setOption('parameters', [
           $entity_type_id => ['type' => 'entity:' . $entity_type_id],
         ]);
+
+      if (empty($this->configFactory->get('view_modes_display.settings')->get('show_preview_directly'))) {
+        $route->setOption('_admin_route', TRUE);
+      }
 
       return $route;
     }
