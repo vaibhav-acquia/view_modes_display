@@ -21,7 +21,7 @@ class SettingsForm extends ConfigFormBase {
   /**
    * The entity type manager.
    *
-   * @var Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
