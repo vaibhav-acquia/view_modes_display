@@ -4,6 +4,6 @@ services:
     arguments: ['@config.factory', '@entity_type.manager', '@entity_display.repository']
   view_modes_display.subscriber:
     class: Drupal\view_modes_display\Routing\RouteSubscriber
-    arguments: ['@entity_type.manager', '@entity_display.repository']
+    arguments: ['@entity_type.manager', '@entity_display.repository', '@config.factory']
     tags:
       - { name: event_subscriber }

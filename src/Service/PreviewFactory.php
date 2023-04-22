@@ -94,11 +94,14 @@ class PreviewFactory {
    *
    * @param array $displays
    *   Entity displays.
+   * @param bool $filter
+   *   Should we filter out those modes that were disabled in the module
+   *   configuration, or show all enabled modes.
    *
    * @return array
    *   Array of enabled display modes.
    */
-  public function getEnabledDisplayModes(array $displays) {
+  public function getEnabledDisplayModes(array $displays, bool $filter = TRUE) {
     $enabledDisplayModes = [];
     foreach ($displays as $display) {
       if ($display->status()) {
@@ -108,6 +111,20 @@ class PreviewFactory {
 
     if (FALSE == array_key_exists('full', $enabledDisplayModes)) {
       $enabledDisplayModes[] = 'full';
+    }
+
+    // Filter those modes we have specifically disabled.
+    if ($filter && isset($display)) {
+      $entityTypeId = $display->getTargetEntityTypeId();
+      $bundle = $display->getTargetBundle();
+      $config = $this->configFactory->get('view_modes_display.settings')->get('disabled_modes');
+      if (!empty($config[$entityTypeId][$bundle])) {
+        foreach ($enabledDisplayModes as $key => $mode) {
+          if (in_array($mode, $config[$entityTypeId][$bundle], TRUE)) {
+            unset($enabledDisplayModes[$key]);
+          }
+        }
+      }
     }
 
     return $enabledDisplayModes;

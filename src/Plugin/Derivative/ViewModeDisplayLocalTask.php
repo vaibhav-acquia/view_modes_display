@@ -3,6 +3,7 @@
 namespace Drupal\view_modes_display\Plugin\Derivative;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -27,16 +28,26 @@ class ViewModeDisplayLocalTask extends DeriverBase implements ContainerDeriverIn
   protected $entityTypeManager;
 
   /**
+   * Drupal\Core\Config\ConfigFactoryInterface definition.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $configFactory;
+
+  /**
    * Creates an ViewModeDisplayLocalTask object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity manager.
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   The translation manager.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The config factory.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, TranslationInterface $string_translation) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, TranslationInterface $string_translation, ConfigFactoryInterface $config_factory) {
     $this->entityTypeManager = $entity_type_manager;
     $this->stringTranslation = $string_translation;
+    $this->configFactory = $config_factory;
   }
 
   /**
@@ -45,7 +56,8 @@ class ViewModeDisplayLocalTask extends DeriverBase implements ContainerDeriverIn
   public static function create(ContainerInterface $container, $base_plugin_id) {
     return new static(
       $container->get('entity_type.manager'),
-      $container->get('string_translation')
+      $container->get('string_translation'),
+      $container->get('config.factory')
     );
   }
 
@@ -54,6 +66,7 @@ class ViewModeDisplayLocalTask extends DeriverBase implements ContainerDeriverIn
    */
   public function getDerivativeDefinitions($base_plugin_definition) {
     $this->derivatives = [];
+    $showPreviewDirectly = $this->configFactory->get('view_modes_display.settings')->get('show_preview_directly') ?? FALSE;
 
     foreach ($this->entityTypeManager->getDefinitions() as $entity_type_id => $entity_type) {
 
