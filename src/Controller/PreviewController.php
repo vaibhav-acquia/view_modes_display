@@ -91,7 +91,7 @@ class PreviewController extends ControllerBase {
 
     $markup = $this->previewFactory->buildMarkup($entity, $view_mode);
     $renderArray[] = [
-      '#prefix' => '<div class="view-mode-list-item view-mode-list-item-' . $view_mode . '"><div class="view-mode-list-item-label">' . $view_modes[$view_mode]['label'] . '</div><div class="view-mode-list-item-content">',
+      '#prefix' => '<div class="view-mode-list-item view-mode-list-item-' . $view_mode . '"><div class="view-mode-list-item-label">' . ($view_modes[$view_mode]['label'] ?? $this->t('Default')) . '</div><div class="view-mode-list-item-content">',
       '#markup' => \Drupal::service('renderer')->render($markup),
       '#suffix' => '</div></div>',
     ];
