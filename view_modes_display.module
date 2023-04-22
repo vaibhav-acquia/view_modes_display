@@ -1,5 +1,6 @@
 <?php
 
+use Drupal\Core\Entity\EntityInterface;
 /**
  * @file
  * Contains view_modes_display.module..
@@ -45,7 +46,7 @@ function view_modes_display_entity_type_alter(array &$entity_types) {
 /**
  * Implements hook_entity_operation().
  */
-function view_modes_display_entity_operation(\Drupal\Core\Entity\EntityInterface $entity) {
+function view_modes_display_entity_operation(EntityInterface $entity) {
   return \Drupal::service('class_resolver')
     ->getInstanceFromDefinition(EntityTypeInfo::class)
     ->entityOperation($entity);
