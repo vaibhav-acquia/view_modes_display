@@ -26,14 +26,14 @@ class PreviewController extends ControllerBase {
    *
    * @var \Drupal\view_modes_display\Service\PreviewFactory
    */
-  protected $previewFactory;
+  protected PreviewFactory $previewFactory;
 
   /**
    * EntityDisplayRepository.
    *
    * @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface
    */
-  protected $entityDisplayRepository;
+  protected EntityDisplayRepositoryInterface $entityDisplayRepository;
 
   /**
    * DefaultController constructor.
@@ -78,8 +78,7 @@ class PreviewController extends ControllerBase {
    * @return array
    *   Preview render array.
    */
-  public function previewEntity(RouteMatchInterface $route_match, $entity_type) {
-    /** @var EntityInterface $entity */
+  public function previewEntity(RouteMatchInterface $route_match, string $entity_type): array {
     $entity = $route_match->getParameter($entity_type);
     $view_mode = $route_match->getParameter('view_mode');
     $view_modes = $this->entityDisplayRepository->getViewModes($entity->getEntityTypeId());
@@ -87,16 +86,16 @@ class PreviewController extends ControllerBase {
     // Special view mode placeholder to fetch all. Default in the route
     // definition.
     if ($view_mode == 'all') {
-      $renderArray = $this->previewFactory->preview($entity);
+      return $this->previewFactory->preview($entity);
     }
-    else {
-      $markup = $this->previewFactory->buildMarkup($entity, $view_mode);
-      $renderArray[] = [
-        '#prefix' => '<div class="view-mode-list-item view-mode-list-item-' . $view_mode . '"><div class="view-mode-list-item-label">' . $view_modes[$view_mode]['label'] . '</div><div class="view-mode-list-item-content">',
-        '#markup' => \Drupal::service('renderer')->render($markup),
-        '#suffix' => '</div></div>',
-      ];
-    }
+
+    $markup = $this->previewFactory->buildMarkup($entity, $view_mode);
+    $renderArray[] = [
+      '#prefix' => '<div class="view-mode-list-item view-mode-list-item-' . $view_mode . '"><div class="view-mode-list-item-label">' . $view_modes[$view_mode]['label'] . '</div><div class="view-mode-list-item-content">',
+      '#markup' => \Drupal::service('renderer')->render($markup),
+      '#suffix' => '</div></div>',
+    ];
+
     return $renderArray;
   }
 
@@ -111,7 +110,7 @@ class PreviewController extends ControllerBase {
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    * @throws \Drupal\Core\Entity\EntityMalformedException
    */
-  public function previewList(RouteMatchInterface $route_match, $entity_type) {
+  public function previewList(RouteMatchInterface $route_match, string $entity_type): array {
     $content = [];
     $links = [];
     $view_modes = $this->entityDisplayRepository->getViewModes($entity_type);

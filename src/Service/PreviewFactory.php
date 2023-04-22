@@ -2,10 +2,12 @@
 
 namespace Drupal\view_modes_display\Service;
 
+use Drupal\Core\Block\BlockManagerInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Render\RendererInterface;
 
 /**
  * Class PreviewFactory.
@@ -17,54 +19,76 @@ class PreviewFactory {
   /**
    * ConfigFactory.
    *
-   * @var Drupal\Core\Config\ConfigFactoryInterface
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
-  protected $configFactory;
+  protected ConfigFactoryInterface $configFactory;
 
   /**
    * EntityTypeManager.
    *
-   * @var Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
    * EntityDisplayRepository.
    *
-   * @var Drupal\Core\Entity\EntityDisplayRepositoryInterface
+   * @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface
    */
-  protected $entityDisplayRepository;
+  protected EntityDisplayRepositoryInterface $entityDisplayRepository;
+
+  /**
+   * BlockManager.
+   *
+   * @var \Drupal\Core\Block\BlockManagerInterface
+   */
+  protected BlockManagerInterface $blockManager;
+
+  /**
+   * Renderer.
+   *
+   * @var \Drupal\Core\Render\RendererInterface
+   */
+  protected RendererInterface $renderer;
 
   /**
    * DefaultController constructor.
    *
-   * @param Drupal\Core\Config\ConfigFactoryInterface $configFactory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   Config Factory.
-   * @param Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   Entity Type Manager.
-   * @param Drupal\Core\Entity\EntityDisplayRepositoryInterface $entityDisplayRepository
+   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entityDisplayRepository
    *   Entity Display Repository.
+   * @param \Drupal\Core\Block\BlockManagerInterface $blockManager
+   *  Block Manager.
+   * @param \Drupal\Core\Render\RendererInterface
+   *  Renderer.
    */
   public function __construct(
     ConfigFactoryInterface $configFactory,
     EntityTypeManagerInterface $entityTypeManager,
-    EntityDisplayRepositoryInterface $entityDisplayRepository
+    EntityDisplayRepositoryInterface $entityDisplayRepository,
+    BlockManagerInterface $blockManager,
+    RendererInterface $renderer
   ) {
     $this->configFactory = $configFactory;
     $this->entityTypeManager = $entityTypeManager;
     $this->entityDisplayRepository = $entityDisplayRepository;
+    $this->blockManager = $blockManager;
+    $this->renderer = $renderer;
   }
 
   /**
    * Preview entity view modes.
    *
-   * @param \Drupal\Core\ContentEntityInterface $entity
+   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
    *   Content Entity Interface.
    *
    * @return array
    *   Preview content of entity view modes.
    */
-  public function preview(ContentEntityInterface $entity) {
+  public function preview(ContentEntityInterface $entity): array {
     $entityTypeId = $entity->getEntityType()->get('id');
 
     $entityDisplays = $this->getEntityDisplays($entityTypeId, $entity->bundle());
@@ -74,14 +98,14 @@ class PreviewFactory {
 
     $renderArray = [];
     foreach ($viewModes as $viewMode => $viewModeData) {
-      if (FALSE == in_array($viewMode, $enabledDisplayModes)) {
+      if (!in_array($viewMode, $enabledDisplayModes)) {
         continue;
       }
 
       $markup = $this->buildMarkup($entity, $viewMode);
       $renderArray[] = [
         '#prefix' => '<div class="view-mode-list-item view-mode-list-item-' . $viewMode . '"><div class="view-mode-list-item-label">' . $viewModeData['label'] . '</div><div class="view-mode-list-item-content">',
-        '#markup' => \Drupal::service('renderer')->render($markup),
+        '#markup' => $this->renderer->render($markup),
         '#suffix' => '</div></div>',
       ];
     }
@@ -98,7 +122,7 @@ class PreviewFactory {
    * @return array
    *   Array of enabled display modes.
    */
-  public function getEnabledDisplayModes(array $displays) {
+  public function getEnabledDisplayModes(array $displays): array {
     $enabledDisplayModes = [];
     foreach ($displays as $display) {
       if ($display->status()) {
@@ -106,7 +130,7 @@ class PreviewFactory {
       }
     }
 
-    if (FALSE == array_key_exists('full', $enabledDisplayModes)) {
+    if (!array_key_exists('full', $enabledDisplayModes)) {
       $enabledDisplayModes[] = 'full';
     }
 
@@ -127,7 +151,7 @@ class PreviewFactory {
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  public function getEntityDisplays($entityTypeId, $entityBundle) {
+  public function getEntityDisplays(string $entityTypeId, string $entityBundle): array {
     $configPrefix = 'core.entity_view_display';
     $prefix = $configPrefix . '.' . $entityTypeId . '.' . $entityBundle . '.';
 
@@ -144,7 +168,7 @@ class PreviewFactory {
   /**
    * Build markup required to render the entity in the desired view mode.
    *
-   * @param Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
    *   Entity class.
    * @param string $viewMode
    *   Entity view mode.
@@ -154,13 +178,12 @@ class PreviewFactory {
    *
    * @todo Handle block requirements better.
    */
-  public function buildMarkup(ContentEntityInterface $entity, $viewMode) {
+  public function buildMarkup(ContentEntityInterface $entity, string $viewMode): array {
     $entityTypeId = $entity->getEntityType()->get('id');
     $viewBuilder = $this->entityTypeManager->getViewBuilder($entityTypeId);
 
     if ('block_content' == $entityTypeId) {
-      $blockManager = \Drupal::service('plugin.manager.block');
-      $blockInstance = $blockManager->createInstance(
+      $blockInstance = $this->blockManager->createInstance(
         'block_content:' . $entity->uuid(),
         [
           'view_mode' => $viewMode,
