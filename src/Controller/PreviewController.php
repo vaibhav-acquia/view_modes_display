@@ -3,14 +3,9 @@
 namespace Drupal\view_modes_display\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
-use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\media\MediaInterface;
-use Drupal\node\NodeInterface;
-use Drupal\block_content\BlockContentInterface;
-use Drupal\user\UserInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\view_modes_display\Service\PreviewFactory;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -20,6 +15,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @package Drupal\view_modes_display\Controller
  */
 class PreviewController extends ControllerBase {
+
+  use StringTranslationTrait;
 
   /**
    * ConfigFactory.
@@ -72,8 +69,8 @@ class PreviewController extends ControllerBase {
    *
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
    *   Route match.
-   *
    * @param string $entity_type
+   *   The entity type.
    *
    * @return array
    *   Preview render array.
@@ -103,9 +100,13 @@ class PreviewController extends ControllerBase {
    * Provides a link list with all available - dedicated - view mode previews.
    *
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   *   Route match.
    * @param string $entity_type
+   *   The entity type.
    *
    * @return array
+   *   A linked list containing all view mode previews.
+   *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    * @throws \Drupal\Core\Entity\EntityMalformedException
@@ -114,7 +115,7 @@ class PreviewController extends ControllerBase {
     $content = [];
     $links = [];
     $view_modes = $this->entityDisplayRepository->getViewModes($entity_type);
-    /** @var EntityInterface $entity */
+    /** @var \Drupal\Core\Entity\EntityInterface $entity */
     $entity = $route_match->getParameter($entity_type);
     $entityDisplays = $this->previewFactory->getEntityDisplays($entity_type, $entity->bundle());
     foreach ($this->previewFactory->getEnabledDisplayModes($entityDisplays) as $display) {
@@ -127,13 +128,13 @@ class PreviewController extends ControllerBase {
       $links[] = [
         '#type' => 'link',
         '#url' => $url,
-        '#title' => t('Preview %label', ['%label' => $label]),
+        '#title' => $this->t('Preview %label', ['%label' => $label]),
       ];
     }
     $content['preview_links'] = [
       '#theme' => 'item_list',
       '#items' => $links,
-      '#title' => t('Available ViewMode Previews:'),
+      '#title' => $this->t('Available ViewMode Previews:'),
     ];
     return $content;
   }

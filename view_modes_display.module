@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Defines the hooks for the view_modes_display module.
+ */
+
 use Drupal\Core\Entity\EntityInterface;
 /**
  * @file
@@ -7,7 +12,7 @@ use Drupal\Core\Entity\EntityInterface;
  */
 
 use Drupal\Core\Routing\RouteMatchInterface;
-use \Drupal\view_modes_display\EntityTypeInfo;
+use Drupal\view_modes_display\EntityTypeInfo;
 
 /**
  * Implements hook_help().

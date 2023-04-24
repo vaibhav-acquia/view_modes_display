@@ -61,9 +61,9 @@ class PreviewFactory {
    * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entityDisplayRepository
    *   Entity Display Repository.
    * @param \Drupal\Core\Block\BlockManagerInterface $blockManager
-   *  Block Manager.
-   * @param \Drupal\Core\Render\RendererInterface
-   *  Renderer.
+   *   Block Manager.
+   * @param \Drupal\Core\Render\RendererInterface $renderer
+   *   Renderer.
    */
   public function __construct(
     ConfigFactoryInterface $configFactory,

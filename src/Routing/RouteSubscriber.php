@@ -29,12 +29,13 @@ class RouteSubscriber extends RouteSubscriberBase {
    */
   protected $entityDisplayRepository;
 
-
   /**
    * Constructs a RouteSubscriber object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
+   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entityDisplayRepository
+   *   The entity display repository.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityDisplayRepositoryInterface $entityDisplayRepository) {
     $this->entityTypeManager = $entity_type_manager;
@@ -51,7 +52,7 @@ class RouteSubscriber extends RouteSubscriberBase {
           $collection->add("entity.$entity_type_id.vmd_preview_list", $route);
         }
         if ($route = $this->getPreviewRenderRoute($entity_type)) {
-          $collection->add("entity.$entity_type_id.vmd_preview_render" , $route);
+          $collection->add("entity.$entity_type_id.vmd_preview_render", $route);
         }
       }
     }
@@ -113,7 +114,7 @@ class RouteSubscriber extends RouteSubscriberBase {
 
         ])
         // Not an admin route - which should allow the frontend theme.
-        //->setOption('_admin_route', TRUE)
+        // ->setOption('_admin_route', TRUE)
         ->setOption('parameters', [
           $entity_type_id => ['type' => 'entity:' . $entity_type_id],
         ]);
@@ -127,7 +128,7 @@ class RouteSubscriber extends RouteSubscriberBase {
    */
   public static function getSubscribedEvents(): array {
     $events = parent::getSubscribedEvents();
-    $events[RoutingEvents::ALTER] = array('onAlterRoutes', -100);
+    $events[RoutingEvents::ALTER] = ['onAlterRoutes', -100];
     return $events;
   }
 

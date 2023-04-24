@@ -38,6 +38,8 @@ class EntityTypeInfo implements ContainerInjectionInterface {
    *
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   Current user.
+   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entityDisplayRepository
+   *   Entity Display Repository.
    */
   public function __construct(AccountInterface $current_user, EntityDisplayRepositoryInterface $entityDisplayRepository) {
     $this->currentUser = $current_user;
