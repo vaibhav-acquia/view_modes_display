@@ -2,4 +2,4 @@ name: View Modes Display
 type: module
 description: Preview view modes for every entity type
 package: Other
-core_version_requirement: ^9.3 || ^10
+core_version_requirement: ^9.3 || ^10 || ^11
